@@ -1,4 +1,4 @@
-VERSION ?= "v1.0.0"
+VERSION ?= "v1.0.1"
 run:
 	go run -ldflags="-X main.version=${VERSION} -X main.date=$(shell date '+%Y-%m-%dT%H:%M:%S%z')" src/main.go
 
