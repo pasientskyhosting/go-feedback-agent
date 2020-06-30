@@ -84,7 +84,7 @@ func GetResponseForMode() (response []byte) {
 				sessionOccupied := GetSessionUtilized(tcpService.IPAddress.Value, tcpService.Port.Value, tcpService.MaxConnections.ToInt())
 
 				// Calculate utilization
-				utilization = utilization + sessionOccupied * tcpService.ImportanceFactor.ToFloat()
+				utilization = utilization + sessionOccupied*tcpService.ImportanceFactor.ToFloat()
 
 				// increase our divider
 				divider++
