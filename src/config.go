@@ -67,7 +67,7 @@ type XMLConfig struct {
 }
 
 func readConfig() {
-	xmlFile, err := os.Open("C:/ProgramData/LoadBalancer.org/LoadBalancer/config.xml")
+	xmlFile, err := os.Open("config.xml")
 	if err != nil {
 		panic(err)
 	}
@@ -84,11 +84,7 @@ func readConfig() {
 }
 
 func InitConfig() {
-	f, err := os.OpenFile("C:/ProgramData/LoadBalancer.org/LoadBalancer/lbfbalogfile", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	if err != nil {
-		log.Fatalf("error opening file: %v", err)
-	}
-	log.SetOutput(f)
+	log.SetOutput(os.Stdout)
 	readConfig()
 
 	intervalTicker := time.NewTicker(time.Second * time.Duration(GlobalConfig.Interval.ToInt()))
