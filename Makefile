@@ -1,17 +1,35 @@
-.PHONEY: clean get
+VERSION ?= "v1.0.0"
+run:
+	go run -ldflags="-X main.version=${VERSION} -X main.date=$(shell date '+%Y-%m-%dT%H:%M:%S%z')" src/main.go
 
-VERSION=`git describe --tags`
-BUILD=`git rev-parse HEAD`
-LDFLAGS=-ldflags "-X main.Version=${VERSION} -X main.Build=${BUILD}"
+all: prep binaries docker
 
-default: build
+prep:
+	mkdir -p bin
 
-build: windows
-windows:
-	 env GOOS=windows GOARCH=amd64 go build ${LDFLAGS} -v -o ./bin/windows64/LBCPUMon ./src
-linux:
-	 env GOOS=linux GOARCH=amd64 go build ${LDFLAGS} -v -o ./bin/linux64/lbcpumon ./src
-get:
-	go mod download
-clean:
-	go clean -modcache
+binaries: linux64 darwin64
+
+build:
+	go build src/main.go
+
+linux64:
+	GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o bin/haproxy-agent64 ./src
+
+darwin64:
+	GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o bin/haproxy-agentOSX ./src
+
+pack-linux64: linux64
+	upx --brute bin/haproxy-agent64
+
+pack-darwin64: darwin64
+	upx --brute bin/haproxy-agentOSX
+
+docker: pack-linux64
+	docker build -t pasientskyhosting/haproxy-agent:latest . && \
+	docker build -t pasientskyhosting/haproxy-agent:"$(VERSION)" .
+
+docker-run:
+	docker run pasientskyhosting/haproxy-agent:"$(VERSION)"
+
+docker-push:
+	docker push pasientskyhosting/haproxy-agent:"$(VERSION)"
